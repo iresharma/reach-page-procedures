@@ -29,7 +29,6 @@ type Template struct {
 	FontColor      string
 	MetaTags       []Meta
 	PageId         string
-	Social         bool
 	SocialPosition string
 }
 
@@ -84,7 +83,24 @@ func CreatePage(userAccountId string, route string) string {
 
 func GetPage(route string) Page {
 	var result Page
-	DB.Table("pages").Select("*").Joins("join templates on pages.id = templates.page_id").Joins("join page_links on page_links.page_id = pages.id").Joins("join meta on meta.template_id = templates.id").Where("pages.route = ?", route).Scan(&result)
+	var template Template
+	var metas []Meta
+	var links []PageLinks
+	if err := DB.First(&result, "route = ?", route).Error; err != nil {
+		log.Println(err)
+	}
+	if err := DB.First(&template, "page_id = ?", result.Id).Error; err != nil {
+		log.Println(err)
+	}
+	if err := DB.Where("template_id = ?", template.Id).Find(&metas).Error; err != nil {
+		log.Println(err)
+	}
+	if err := DB.Where("page_id = ?", result.Id).Find(&links).Error; err != nil {
+		log.Println(err)
+	}
+	result.Links = links
+	template.MetaTags = metas
+	result.Template = template
 	return result
 }
 
@@ -101,7 +117,6 @@ func CreateTemplate(pageId string, Name string, Desc string, Image string, Butto
 		FontColor:      FontColor,
 		MetaTags:       nil,
 		PageId:         pageId,
-		Social:         Social,
 		SocialPosition: SocialPosition,
 	}
 	if err := DB.Create(&template).Error; err != nil {
@@ -110,9 +125,9 @@ func CreateTemplate(pageId string, Name string, Desc string, Image string, Butto
 	return template
 }
 
-func UpdateTemplate(pageId string, values map[string]string) {
-	if err := DB.Model(&Template{}).Where("pageId = ?", pageId).Updates(values).Error; err != nil {
-		log.Println("Fat fata fat")
+func UpdateTemplate(pageId string, values Template) {
+	if err := DB.Model(&Template{}).Where("page_id = ?", pageId).Updates(values).Error; err != nil {
+		log.Println(err)
 	}
 }
 
@@ -120,14 +135,14 @@ func CreateLink(pageId string, Name string, Link string, icon string, social boo
 	linkId := uuid.New().String()
 	pageLink := PageLinks{Id: linkId, PageId: pageId, Name: Name, Link: Link, Icon: icon, Social: social}
 	if err := DB.Create(&pageLink).Error; err != nil {
-		log.Println("Lulz ye bhi fata")
+		log.Println(err)
 	}
 	return pageLink
 }
 
-func UpdateLink(linkId string, vales map[string]string) {
+func UpdateLink(linkId string, vales PageLinks) {
 	if err := DB.Model(&PageLinks{}).Where("id = ?", linkId).Updates(vales).Error; err != nil {
-		log.Println("heheheeh I am havingt a bad day")
+		log.Println(err)
 	}
 }
 
@@ -135,13 +150,13 @@ func CreateMetaLinks(templateId string, tagType string, value string) Meta {
 	metaId := uuid.New().String()
 	meta := Meta{Id: metaId, Type: tagType, Value: value, TemplateId: templateId}
 	if err := DB.Create(&meta).Error; err != nil {
-		log.Println("Meta tag created")
+		log.Println(err)
 	}
 	return meta
 }
 
-func UpdateMetaLink(metaId string, values map[string]string) {
+func UpdateMetaLink(metaId string, values Meta) {
 	if err := DB.Model(&Meta{}).Where("id = ?", metaId).Updates(values).Error; err != nil {
-		log.Println("update of meta failed")
+		log.Println(err)
 	}
 }

@@ -22,7 +22,6 @@ func DataBaseTemplateToRPCTemplate(template database.Template) pb.Template {
 		FontColor:      template.FontColor,
 		MetaTags:       metas,
 		PageId:         template.PageId,
-		Social:         template.Social,
 		SocialPosition: template.SocialPosition,
 	}
 }

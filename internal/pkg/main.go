@@ -4,7 +4,6 @@ import (
 	"Reach-page/internal/pkg/RPC/pb"
 	"Reach-page/internal/pkg/database"
 	"context"
-	"strconv"
 )
 
 type PageServer struct {
@@ -12,7 +11,7 @@ type PageServer struct {
 }
 
 func (s *PageServer) GetPage(ctx context.Context, input *pb.IdRequest) (*pb.Page, error) {
-	res := database.GetPage(input.GetId())
+	res := database.GetPage(input.Id)
 	template := DataBaseTemplateToRPCTemplate(res.Template)
 	links := []*pb.PageLinks{}
 	for _, el := range res.Links {
@@ -53,16 +52,15 @@ func (s *PageServer) CreateTemplate(ctx context.Context, input *pb.TemplateReque
 }
 
 func (s *PageServer) UpdateTemplate(ctx context.Context, input *pb.TemplateRequest) (*pb.VoidResponse, error) {
-	values := map[string]string{
-		"Name":           input.Name,
-		"Desc":           input.Desc,
-		"Image":          input.Image,
-		"Button":         input.Button,
-		"Background":     input.Background,
-		"Font":           input.Font,
-		"FontColor":      input.FontColor,
-		"Social":         strconv.FormatBool(input.Social),
-		"SocialPosition": input.SocialPosition,
+	values := database.Template{
+		Name:           input.Name,
+		Desc:           input.Desc,
+		Image:          input.Image,
+		Button:         input.Button,
+		Background:     input.Background,
+		Font:           input.Font,
+		FontColor:      input.FontColor,
+		SocialPosition: input.SocialPosition,
 	}
 	database.UpdateTemplate(
 		input.PageId, values,
@@ -77,13 +75,13 @@ func (s *PageServer) CreateLink(ctx context.Context, input *pb.CreateLinkRequest
 }
 
 func (s *PageServer) UpdateLink(ctx context.Context, links *pb.PageLinks) (*pb.VoidResponse, error) {
-	values := map[string]string{
-		"Id":     links.Id,
-		"Name":   links.Name,
-		"Link":   links.Link,
-		"Icon":   links.Icon,
-		"Social": strconv.FormatBool(links.Social),
-		"PageId": links.PageId,
+	values := database.PageLinks{
+		Id:     links.Id,
+		Name:   links.Name,
+		Link:   links.Link,
+		Icon:   links.Icon,
+		Social: links.Social,
+		PageId: links.PageId,
 	}
 	database.UpdateLink(links.Id, values)
 	return &pb.VoidResponse{}, nil
@@ -96,11 +94,11 @@ func (s *PageServer) CreateMetaLink(ctx context.Context, input *pb.Meta) (*pb.Me
 }
 
 func (s *PageServer) UpdateMetaLink(ctx context.Context, input *pb.Meta) (*pb.VoidResponse, error) {
-	values := map[string]string{
-		"Id":         input.Id,
-		"Value":      input.Value,
-		"Type":       input.Type,
-		"TemplateId": input.TemplateId,
+	values := database.Meta{
+		Id:         input.Id,
+		Value:      input.Value,
+		Type:       input.Type,
+		TemplateId: input.TemplateId,
 	}
 	database.UpdateMetaLink(input.Id, values)
 	return &pb.VoidResponse{}, nil
