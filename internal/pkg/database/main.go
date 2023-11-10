@@ -42,12 +42,13 @@ type Meta struct {
 
 type PageLinks struct {
 	gorm.Model
-	Id     string
-	Name   string
-	Link   string
-	Icon   string
-	Social bool
-	PageId string
+	Id       string
+	Name     string
+	Link     string
+	Icon     string
+	Social   bool
+	PageId   string
+	Sequence int
 }
 
 var connStr = "postgresql://iresharma@localhost/reach-systems"
@@ -95,7 +96,30 @@ func GetPage(route string) Page {
 	if err := DB.Where("template_id = ?", template.Id).Find(&metas).Error; err != nil {
 		log.Println(err)
 	}
-	if err := DB.Where("page_id = ?", result.Id).Find(&links).Error; err != nil {
+	if err := DB.Where("page_id = ?", result.Id).Find(&links).Order("sequence").Error; err != nil {
+		log.Println(err)
+	}
+	result.Links = links
+	template.MetaTags = metas
+	result.Template = template
+	return result
+}
+
+func GetPageId(route string) Page {
+	var result Page
+	var template Template
+	var metas []Meta
+	var links []PageLinks
+	if err := DB.First(&result, "id = ?", route).Error; err != nil {
+		log.Println(err)
+	}
+	if err := DB.First(&template, "page_id = ?", result.Id).Error; err != nil {
+		log.Println(err)
+	}
+	if err := DB.Where("template_id = ?", template.Id).Find(&metas).Error; err != nil {
+		log.Println(err)
+	}
+	if err := DB.Where("page_id = ?", result.Id).Find(&links).Order("sequence").Error; err != nil {
 		log.Println(err)
 	}
 	result.Links = links
@@ -131,9 +155,9 @@ func UpdateTemplate(pageId string, values Template) {
 	}
 }
 
-func CreateLink(pageId string, Name string, Link string, icon string, social bool) PageLinks {
+func CreateLink(pageId string, Name string, Link string, icon string, social bool, sequence int) PageLinks {
 	linkId := uuid.New().String()
-	pageLink := PageLinks{Id: linkId, PageId: pageId, Name: Name, Link: Link, Icon: icon, Social: social}
+	pageLink := PageLinks{Id: linkId, PageId: pageId, Name: Name, Link: Link, Icon: icon, Social: social, Sequence: sequence}
 	if err := DB.Create(&pageLink).Error; err != nil {
 		log.Println(err)
 	}

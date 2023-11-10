@@ -69,7 +69,7 @@ func (s *PageServer) UpdateTemplate(ctx context.Context, input *pb.TemplateReque
 }
 
 func (s *PageServer) CreateLink(ctx context.Context, input *pb.CreateLinkRequest) (*pb.PageLinks, error) {
-	res := database.CreateLink(input.PageId, input.Name, input.Link, input.Icon, input.IsSocialIcon)
+	res := database.CreateLink(input.PageId, input.Name, input.Link, input.Icon, input.IsSocialIcon, int(input.Sequence))
 	rpcLink := DatabaseLinkToRPCLink(res)
 	return &rpcLink, nil
 }
@@ -102,4 +102,21 @@ func (s *PageServer) UpdateMetaLink(ctx context.Context, input *pb.Meta) (*pb.Vo
 	}
 	database.UpdateMetaLink(input.Id, values)
 	return &pb.VoidResponse{}, nil
+}
+
+func (s *PageServer) GetPageId(ctx context.Context, input *pb.IdRequest) (*pb.Page, error) {
+	res := database.GetPageId(input.Id)
+	template := DataBaseTemplateToRPCTemplate(res.Template)
+	links := []*pb.PageLinks{}
+	for _, el := range res.Links {
+		link := DatabaseLinkToRPCLink(el)
+		links = append(links, &link)
+	}
+	return &pb.Page{
+		Id:            res.Id,
+		Route:         res.Route,
+		Template:      &template,
+		UserAccountId: res.UserAccountId,
+		Links:         links,
+	}, nil
 }
