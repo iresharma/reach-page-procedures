@@ -4,6 +4,7 @@ import (
 	"Reach-page/internal/pkg/RPC/pb"
 	"Reach-page/internal/pkg/database"
 	"context"
+	"log"
 )
 
 type PageServer struct {
@@ -105,6 +106,8 @@ func (s *PageServer) UpdateMetaLink(ctx context.Context, input *pb.Meta) (*pb.Vo
 }
 
 func (s *PageServer) GetPageId(ctx context.Context, input *pb.IdRequest) (*pb.Page, error) {
+	log.Println("Input page id")
+	log.Println(input.Id)
 	res := database.GetPageId(input.Id)
 	template := DataBaseTemplateToRPCTemplate(res.Template)
 	links := []*pb.PageLinks{}

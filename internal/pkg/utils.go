@@ -37,11 +37,12 @@ func DatabaseMetaToRPCMeta(tag database.Meta) pb.Meta {
 
 func DatabaseLinkToRPCLink(link database.PageLinks) pb.PageLinks {
 	return pb.PageLinks{
-		Id:     link.Id,
-		Name:   link.Name,
-		Link:   link.Link,
-		Icon:   link.Icon,
-		Social: link.Social,
-		PageId: link.PageId,
+		Id:       link.Id,
+		Name:     link.Name,
+		Link:     link.Link,
+		Icon:     link.Icon,
+		Social:   link.Social,
+		PageId:   link.PageId,
+		Sequence: int32(link.Sequence),
 	}
 }
