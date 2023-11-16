@@ -11,6 +11,13 @@ type PageServer struct {
 	pb.PagePackageServer
 }
 
+func (s *PageServer) ServerBuild(ctx context.Context, input *pb.VoidResponse) (*pb.ServerBuildResponse, error) {
+	res := database.ServerBuild()
+	return &pb.ServerBuildResponse{
+		Routes: res,
+	}, nil
+}
+
 func (s *PageServer) GetPage(ctx context.Context, input *pb.IdRequest) (*pb.Page, error) {
 	res := database.GetPage(input.Id)
 	template := DataBaseTemplateToRPCTemplate(res.Template)
@@ -77,12 +84,13 @@ func (s *PageServer) CreateLink(ctx context.Context, input *pb.CreateLinkRequest
 
 func (s *PageServer) UpdateLink(ctx context.Context, links *pb.PageLinks) (*pb.VoidResponse, error) {
 	values := database.PageLinks{
-		Id:     links.Id,
-		Name:   links.Name,
-		Link:   links.Link,
-		Icon:   links.Icon,
-		Social: links.Social,
-		PageId: links.PageId,
+		Id:       links.Id,
+		Name:     links.Name,
+		Link:     links.Link,
+		Icon:     links.Icon,
+		Social:   links.Social,
+		PageId:   links.PageId,
+		Sequence: int(links.Sequence),
 	}
 	database.UpdateLink(links.Id, values)
 	return &pb.VoidResponse{}, nil

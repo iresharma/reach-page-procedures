@@ -69,6 +69,14 @@ func CreateConnection() *gorm.DB {
 	return db
 }
 
+func ServerBuild() []string {
+	var routes []string
+	if err := DB.Table("pages").Distinct().Pluck("route", &routes).Error; err != nil {
+		log.Println("fetch routes failed")
+	}
+	return routes
+}
+
 func CreatePage(userAccountId string, route string) string {
 	pageId := uuid.New()
 	page := &Page{Id: pageId.String(), UserAccountId: userAccountId, Route: route}

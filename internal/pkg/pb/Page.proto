@@ -14,6 +14,7 @@ service PagePackage {
   rpc UpdateLink(PageLinks) returns (VoidResponse);
   rpc CreateMetaLink(Meta) returns (Meta);
   rpc UpdateMetaLink(Meta) returns (VoidResponse);
+  rpc ServerBuild(VoidResponse) returns (ServerBuildResponse);
 }
 
 // Database objects
@@ -55,7 +56,7 @@ message PageLinks {
   string Icon = 4;
   bool Social = 5;
   string PageId = 6;
-  int32 Sequence = 7;
+  int32 sequence = 7;
 }
 
 // Requests
@@ -101,4 +102,8 @@ message VoidResponse {}
 
 message PageResponse {
   string id = 1;
+}
+
+message ServerBuildResponse {
+  repeated string routes = 1;
 }
