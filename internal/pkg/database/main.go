@@ -6,6 +6,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
+	"os"
 )
 
 type Page struct {
@@ -51,7 +52,7 @@ type PageLinks struct {
 	Sequence int
 }
 
-var connStr = "postgresql://iresharma@localhost/reach-systems"
+var connStr = os.Getenv("POSTGRES")
 var DB *gorm.DB = nil
 
 func CreateConnection() *gorm.DB {
