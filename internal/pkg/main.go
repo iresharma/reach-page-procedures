@@ -96,6 +96,11 @@ func (s *PageServer) UpdateLink(ctx context.Context, links *pb.PageLinks) (*pb.V
 	return &pb.VoidResponse{}, nil
 }
 
+func (s *PageServer) DeleteLink(ctx context.Context, id *pb.IdRequest) (*pb.VoidResponse, error) {
+	database.DeleteLink(id.Id)
+	return &pb.VoidResponse{}, nil
+}
+
 func (s *PageServer) CreateMetaLink(ctx context.Context, input *pb.Meta) (*pb.Meta, error) {
 	res := database.CreateMetaLinks(input.TemplateId, input.Type, input.Value)
 	rpcMeta := DatabaseMetaToRPCMeta(res)

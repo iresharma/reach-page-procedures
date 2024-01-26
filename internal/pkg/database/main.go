@@ -88,6 +88,18 @@ func CreatePage(userAccountId string, route string) string {
 		log.Println(err)
 		log.Println("Update fata")
 	}
+	CreateTemplate(
+		page.Id,
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		false,
+		"",
+	)
 	return page.Id
 }
 
@@ -175,6 +187,12 @@ func CreateLink(pageId string, Name string, Link string, icon string, social boo
 
 func UpdateLink(linkId string, vales PageLinks) {
 	if err := DB.Model(&PageLinks{}).Where("id = ?", linkId).Updates(vales).Error; err != nil {
+		log.Println(err)
+	}
+}
+
+func DeleteLink(linkId string) {
+	if err := DB.Delete(&PageLinks{}, linkId).Error; err != nil {
 		log.Println(err)
 	}
 }
