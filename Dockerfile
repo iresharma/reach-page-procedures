@@ -35,7 +35,7 @@ COPY --from=builder /grpc-app .
 ARG POSTGRES
 
 # Set environment variables
-ENV POSTGRES=postgres://user:password@localhost:5432/dbname
+ENV POSTGRES=$POSTGRES
 
 # Expose the port the application runs on (assuming default gRPC port 50051)
 EXPOSE 4001
